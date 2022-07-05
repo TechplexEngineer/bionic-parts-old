@@ -15,8 +15,11 @@
 			<path d="M0,0 L1,2 C1.5,3 1.5,3 2,3 L2,0 Z" />
 		</svg>
 		<ul>
-			<li class:active={$page.url.pathname === '/'}><a href="/">Projects</a></li>
-			<li class:active={$page.url.pathname === '/dashboards'}><a href="/dashboards">Dashboards</a></li>
+			<li class:active={$page.url.pathname === '/'}><a href="/">Home</a></li>
+			<li class:active={$page.url.pathname === '/projects'}><a href="/projects">Projects</a></li>
+			<li class:active={$page.url.pathname === '/dashboards'}>
+				<a href="/dashboards">Dashboards</a>
+			</li>
 			<li class:active={$page.url.pathname === '/vendors'}><a href="/vendors">Vendors</a></li>
 			<li class:active={$page.url.pathname === '/orders'}><a href="/orders">Orders</a></li>
 			<li class:active={$page.url.pathname === '/inventory'}><a href="/inventory">Inventory</a></li>
