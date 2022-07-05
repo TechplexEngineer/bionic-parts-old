@@ -3,7 +3,26 @@
 </script>
 
 <script lang="ts">
-	import Counter from '$lib/Counter.svelte';
+	import Project from '$lib/Project.svelte';
+
+	let projects = [
+		{
+			name: "Rapid React",
+			partNumberPrefix: "22"
+		},
+		{
+			name: "N.E.R.D.",
+			partNumberPrefix: "NERD"
+		},
+		{
+			name: "TShirt Cannon",
+			partNumberPrefix: "TSHIRT"
+		},
+		{
+			name: "Powder Coating Oven",
+			partNumberPrefix: "oven"
+		}
+	];
 </script>
 
 <svelte:head>
@@ -13,21 +32,18 @@
 
 <section>
 	<h1>
-		<span class="welcome">
-			<picture>
-				<source srcset="svelte-welcome.webp" type="image/webp" />
-				<img src="svelte-welcome.png" alt="Welcome" />
-			</picture>
-		</span>
-
-		to your new<br />SvelteKit app
+		Projects
 	</h1>
 
-	<h2>
-		try editing <strong>src/routes/index.svelte</strong>
-	</h2>
+	<div class="row">
+		{#each projects as project}
+		<div class="col mb-2" style="max-width: 330px">
+			<Project {project}/>
+		</div>
+		{/each}
+	</div>
 
-	<Counter />
+
 </section>
 
 <style>

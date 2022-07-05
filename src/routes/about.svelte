@@ -14,6 +14,10 @@
 	export const prerender = true;
 </script>
 
+<script lang="ts">
+	import Counter from '$lib/Counter.svelte';
+</script>
+
 <svelte:head>
 	<title>About</title>
 	<meta name="description" content="About this app" />
@@ -39,6 +43,7 @@
 		The <a href="/todos">TODOs</a> page illustrates SvelteKit's data loading and form handling. Try using
 		it with JavaScript disabled!
 	</p>
+		<Counter />
 </div>
 
 <style>
