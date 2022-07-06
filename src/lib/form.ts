@@ -38,8 +38,9 @@ export function enhance(
 		const token = (current_token = {});
 
 		e.preventDefault();
-
+		console.log('formBefore', form);
 		const data = new FormData(form);
+		console.log('data', data);
 
 		if (pending) pending({ data, form });
 

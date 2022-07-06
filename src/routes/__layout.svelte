@@ -11,7 +11,7 @@
 </main>
 
 <footer>
-	<p>visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to learn SvelteKit</p>
+	<p>Robotics <abbr title="Team Information Management System">TIMS</abbr> by Team 4909</p>
 </footer>
 
 <style>

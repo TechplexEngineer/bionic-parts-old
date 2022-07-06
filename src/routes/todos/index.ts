@@ -2,6 +2,7 @@ import { api } from './_api';
 import type { RequestHandler } from './__types';
 
 export const get: RequestHandler = async ({ locals }) => {
+	console.log(`GET todos`);
 	// locals.userid comes from src/hooks.js
 	const response = await api('GET', `todos/${locals.userid}`);
 
@@ -30,6 +31,7 @@ export const get: RequestHandler = async ({ locals }) => {
 
 export const post: RequestHandler = async ({ request, locals }) => {
 	const form = await request.formData();
+	console.log(`POST todos ${form.get('text')}`);
 
 	await api('POST', `todos/${locals.userid}`, {
 		text: form.get('text')
