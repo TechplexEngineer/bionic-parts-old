@@ -15,16 +15,18 @@ export const Onshape = new OnshapeApi({
 	debug: false
 });
 
-export const get: RequestHandler = async ({ locals, url }) => {
-	console.log('GET projects', locals, url.searchParams.get('did'));
+export const get: RequestHandler = async ({ locals, url, params }) => {
+	console.log('GET projects', locals, params.did);
 
 	// const did = 'f2dd281fff1cee4d67627c2e'; //toolbox drawer
-	const did = url.searchParams.get('did');
+	const did = params.did;
 
 	if (!did) {
 		//this is an error
 		//No document selected @todo
-		return {};
+		return {
+			status: 404
+		};
 	}
 
 	const doc = await Onshape.GetDocument(did);
@@ -33,7 +35,7 @@ export const get: RequestHandler = async ({ locals, url }) => {
 
 	const elementTypeFilter = url.searchParams.get('type');
 
-	const opts: GetElementsInDocumentOptional = { elementType: 'Assembly' };
+	const opts: GetElementsInDocumentOptional = {};
 	if (elementTypeFilter) {
 		if (elementTypeFilter.toLowerCase() == 'any') {
 			delete opts.elementType;

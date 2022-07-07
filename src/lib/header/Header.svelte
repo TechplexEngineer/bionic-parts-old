@@ -16,6 +16,7 @@
 		</svg>
 		<ul>
 			<li class:active={$page.url.pathname === '/'}><a href="/">Home</a></li>
+			<li class:active={$page.url.pathname === '/onshape'}><a href="/onshape">Onshape</a></li>
 			<li class:active={$page.url.pathname === '/projects'}><a href="/projects">Projects</a></li>
 			<li class:active={$page.url.pathname === '/dashboards'}>
 				<a href="/dashboards">Dashboards</a>
