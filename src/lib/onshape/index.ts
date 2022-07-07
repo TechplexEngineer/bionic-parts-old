@@ -54,6 +54,13 @@ export const buildNonce = function () {
 	return nonce;
 };
 
+export interface ErrorResponse {
+	code: number;
+	moreInfoUrl: string;
+	message: string;
+	status: number;
+}
+
 export const copyObject = function (object: any) {
 	if (object === null || typeof object !== 'object') {
 		return object;
@@ -311,7 +318,7 @@ export default class Onshape {
 		wvm: WVM,
 		wvmId: string,
 		elementId: string
-	): Promise<GetBillOfMaterialsResponse> {
+	): Promise<GetBillOfMaterialsResponse | ErrorResponse> {
 		const opts: GetOpts = {
 			d: documentId,
 			e: elementId,

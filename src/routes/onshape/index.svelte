@@ -15,6 +15,21 @@
     export let doc:GetDocumentResponse;
     export let elements: GetElementsInDocumentResponse;
 
+    let elementsByType = elements.reduce((prev, cur)=>{
+
+        let type = cur.type;
+        if (cur.type.toLowerCase() == "application" && cur.dataType == "onshape-app/drawing") {
+            type = "Drawing";
+        }
+
+        if (! (type in prev)) {
+            prev[type] = [];
+        }
+
+        prev[type].push(cur)
+        return prev
+    }, {})
+
     let newProjectModalOpen = false;
     const newProjectModalToggle = () => (newProjectModalOpen = !newProjectModalOpen);
 
@@ -36,24 +51,45 @@
     </div>
 
     <h2>Doc: {doc.name}</h2>
+    <ul>
+        <li>did: {doc.id}</li>
+        <li>wid: {doc.defaultWorkspace.id}</li>
+    </ul>
 
 
 
 
     <div class="row">
+<!--        <div class="col">-->
+<!--            <ul>-->
+<!--                {#each elements as element}-->
+<!--                    <li class="mt-2">-->
+<!--                        {element.name} &#45;&#45; {element.type} &#45;&#45;-->
+<!--                        <button class="btn btn-sm btn-secondary" on:click={()=>{-->
+<!--                            textareaValue = JSON.stringify(element, null, 4)-->
+<!--                        }}>Inspect</button>-->
+<!--                    </li>-->
+<!--                {/each}-->
+<!--            </ul>-->
+<!--        </div>-->
         <div class="col">
-            <ul>
-                {#each elements as element}
+
+            {#each [...new Map(Object.entries(elementsByType))] as [key, elements]}
+                <h3>{key}</h3>
+                <ul>
+                    {#each elements as element}
                     <li class="mt-2">
-                        {element.name} -- {element.type} --
                         <button class="btn btn-sm btn-secondary" on:click={()=>{
                             textareaValue = JSON.stringify(element, null, 4)
                         }}>Inspect</button>
+                        <a href="/onshape/bom?did={doc.id}&wid={doc.defaultWorkspace.id}&eid={element.id}" class="btn btn-primary btn-sm">Bom</a>
+                        {element.name}
                     </li>
                 {/each}
-            </ul>
+                </ul>
+            {/each}
         </div>
-        <div class="col">
+        <div class="col" style="min-height: 60vh;">
             <textarea class="form-control w-100 h-100" disabled bind:value={textareaValue}></textarea>
         </div>
     </div>
