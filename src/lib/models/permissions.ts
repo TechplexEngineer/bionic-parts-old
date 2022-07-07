@@ -3,19 +3,22 @@ import { DataType } from 'sequelize-typescript';
 import { CommonProps } from './commonProps';
 
 @Table
-export class Permission extends Model {
+export class Permission extends Model<Permission> {
+	@Column({ primaryKey: true })
+	pid!: string;
+
 	@Column(DataType.STRING)
-	name: string;
+	name!: string;
 
-	@Column(DataType.BOOLEAN)
-	read: boolean;
-
-	@Column(DataType.BOOLEAN)
-	write: boolean;
-
-	@Column(DataType.BOOLEAN)
-	delete: boolean;
-
-	@Column(DataType.JSON)
-	resources: string[];
+	// @Column(DataType.BOOLEAN)
+	// read!: boolean;
+	//
+	// @Column(DataType.BOOLEAN)
+	// write!: boolean;
+	//
+	// @Column(DataType.BOOLEAN)
+	// delete!: boolean;
+	//
+	// @Column(DataType.JSON)
+	// resources: string[] | undefined;
 }

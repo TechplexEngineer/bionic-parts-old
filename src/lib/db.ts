@@ -8,11 +8,12 @@ const opts: SequelizeOptions = {
 	dialect: 'sqlite',
 	username: 'root',
 	password: '',
-	storage: 'test.db',
-	models: [Permission]
+	storage: 'test.db'
+	// models: [Permission]
 };
 
 const sequelize = new Sequelize(opts);
+sequelize.addModels([Permission]);
 (async () => {
 	await sequelize.sync();
 })();
