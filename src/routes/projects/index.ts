@@ -1,6 +1,5 @@
 import type { RequestHandler } from '@sveltejs/kit';
-import db from '$lib/db';
-let projects = [
+const projects = [
 	{
 		name: 'Rapid React',
 		partNumberPrefix: '22'
@@ -21,8 +20,6 @@ let projects = [
 
 export const get: RequestHandler = async ({ locals }) => {
 	console.log('GET projects');
-
-	console.log(db.models);
 
 	return {
 		body: {
