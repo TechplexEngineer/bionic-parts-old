@@ -6,6 +6,16 @@ import type {
 	GetElementsInDocumentOptional,
 	GetElementsInDocumentResponse
 } from './GetElementsInDocument';
+import type { BTTranslateFormatParams, BTTranslationRequestInfo } from './BTTranslationRequestInfo';
+import { BTTranslationRequestInfo_State } from './BTTranslationRequestInfo';
+
+/**
+ * Wrapper for setTimeout to create delays
+ * @param ms number of miliseconds to delay
+ * @returns Void
+ */
+export const delay = (ms: number): Promise<void> =>
+	new Promise((resolve) => setTimeout(resolve, ms));
 
 // creates random 25-character string
 export const buildNonce = function () {
@@ -122,6 +132,7 @@ export type OnshapeApiCreds = {
 	secretKey: string;
 	debug: boolean;
 };
+
 export enum WVM {
 	W = 'w',
 	V = 'm',
@@ -169,15 +180,53 @@ export type GetOpts =
 			subresource?: string;
 			baseUrl?: string;
 			query?: { [key: string]: string };
+			headers?: any;
+			rawResponse?: boolean;
 	  }
 	| {
 			path?: string;
 			baseUrl?: string;
 			query?: { [key: string]: string };
+			rawResponse?: boolean;
 	  };
+
+// export type PostOpts = GetOpts & { body: any };
+export type PostOpts =
+	| {
+			d: string;
+			w?: string;
+			v?: string;
+			m?: string;
+			e?: string;
+			resource: string;
+			subresource?: string;
+			baseUrl?: string;
+			query?: { [key: string]: string };
+			headers?: any;
+			body: any;
+	  }
+	| {
+			path?: string;
+			baseUrl?: string;
+			query?: { [key: string]: string };
+			body: any;
+	  };
+
+export enum DrawingExportType {
+	INSPECTION_LIST = 'INSPECTION_LIST',
+	DRAWING_JSON = 'DRAWING_JSON',
+	PDF = 'PDF',
+	DWG = 'DWG',
+	DXF = 'DXF',
+	DWT = 'DWT',
+	PNG = 'PNG',
+	JPEG = 'JPEG',
+	SVG = 'SVG'
+}
 
 export default class Onshape {
 	private creds: OnshapeApiCreds;
+
 	constructor(creds: OnshapeApiCreds) {
 		this.creds = creds;
 		if (!this.creds.accessKey) {
@@ -194,7 +243,7 @@ export default class Onshape {
 		}
 	}
 
-	private buildHeaders(method: string, path: string, queryString: string, inputHeaders: string) {
+	private buildHeaders(method: string, path: string, queryString: string, inputHeaders: any) {
 		const headers = copyObject(inputHeaders);
 		// the Date header needs to be reasonably (5 minutes) close to the server time when the request is received
 		const authDate = new Date().toUTCString();
@@ -271,6 +320,9 @@ export default class Onshape {
 			method: 'GET',
 			headers: headers
 		});
+		if (opts.rawResponse) {
+			return res;
+		}
 		return await res.json();
 	}
 
@@ -281,6 +333,9 @@ export default class Onshape {
 		return (await this.get(opts)) as any;
 	}
 
+	/**
+	 * Get parts in a part studio
+	 */
 	public async GetParts(
 		documentId: string,
 		wvm: WVM,
@@ -296,7 +351,9 @@ export default class Onshape {
 		return (await this.get(opts as any)) as any;
 	}
 
-	// /api/documents/d/f2dd281fff1cee4d67627c2e/w/606e94ad4692296338edd039/elements?elementType=Assembly
+	/**
+	 * Get Elements "tabs" in a document
+	 */
 	public async GetElementsInDocument(
 		documentId: string,
 		wvm: WVM,
@@ -313,6 +370,9 @@ export default class Onshape {
 		return (await this.get(opts)) as any;
 	}
 
+	/**
+	 * Get an existing bill of materials for an assembly
+	 */
 	public async GetBillOfMaterials(
 		documentId: string,
 		wvm: WVM,
@@ -327,5 +387,137 @@ export default class Onshape {
 		};
 		opts[wvm] = wvmId;
 		return (await this.get(opts as any)) as any;
+	}
+
+	public async GetPartStudioStl(
+		documentId: string,
+		wvm: WVM,
+		wvmId: string,
+		elementId: string,
+		options?: any
+	) {
+		const opts: GetOpts = {
+			d: documentId,
+			e: elementId,
+			query: options,
+			resource: 'partstudios',
+			subresource: 'stl',
+			headers: {
+				Accept: 'application/vnd.onshape.v1+octet-stream'
+			}
+		};
+		opts[wvm] = wvmId;
+		return (await this.get(opts as any)) as any;
+	}
+
+	public async post(opts: PostOpts) {
+		let path = '';
+		if ('path' in opts) {
+			path = opts.path as any;
+		} else {
+			path = buildDWMVEPath(opts as any);
+		}
+		const method = 'POST';
+		const baseUrl = 'baseUrl' in opts ? opts.baseUrl : this.creds.baseUrl;
+		const inputHeaders = inputHeadersFromOpts(opts as any);
+		let queryString = buildQueryString(opts as any);
+		const headers = this.buildHeaders(method, path, queryString, inputHeaders);
+		if (queryString !== '') queryString = '?' + queryString;
+		const requestUrl = baseUrl + path + queryString;
+		if (this.creds.debug) {
+			console.log(`${method} ${requestUrl}\n`, headers, '\n', JSON.stringify(opts.body));
+		}
+		const res = await fetch(requestUrl, {
+			method: method,
+			headers: headers,
+			body: JSON.stringify(opts.body)
+		});
+		return await res.json();
+	}
+
+	public async BlobElement_CreateTranslation(
+		documentId: string,
+		wv: WVM.W | WVM.V,
+		wvId: string,
+		elementId: string,
+		body: BTTranslateFormatParams
+	): Promise<BTTranslationRequestInfo | ErrorResponse> {
+		const opts: PostOpts = {
+			d: documentId,
+			e: elementId,
+			resource: 'blobelements',
+			subresource: 'translations',
+			body: body
+		};
+		opts[wv] = wvId;
+		return (await this.post(opts as any)) as any;
+	}
+
+	public async Translations_GetInfo(
+		translationId: string
+	): Promise<BTTranslationRequestInfo | ErrorResponse> {
+		const opts: GetOpts = {
+			path: `/api/translations/${translationId}`
+		};
+		return (await this.get(opts as any)) as any;
+	}
+
+	public async BlobElements_Download(
+		documentId: string,
+		workspaceId: string,
+		elementId: string
+	): Promise<Response> {
+		const opts: GetOpts = {
+			d: documentId,
+			w: workspaceId,
+			e: elementId,
+			resource: 'blobelements',
+			headers: {
+				Accept: 'application/vnd.onshape.v1+octet-stream'
+			},
+			rawResponse: true
+		};
+		return (await this.get(opts as any)) as any;
+	}
+
+	public async ExportDrawing(
+		documentId: string,
+		wv: WVM.W | WVM.V,
+		wvId: string,
+		elementId: string,
+		exportType: DrawingExportType
+	): Promise<Response> {
+		let transRes = await this.BlobElement_CreateTranslation(documentId, wv, wvId, elementId, {
+			//formatName: exportType
+			formatName: 'PDF',
+			destinationName: 'name.pdf'
+		});
+		if ('status' in transRes && transRes.status / 100 != 2) {
+			throw new Error('Unable to create translation: ' + JSON.stringify(transRes));
+		}
+		console.log('REQ State', (transRes as BTTranslationRequestInfo).requestState);
+		//@todo check error
+		while (
+			(transRes as BTTranslationRequestInfo).requestState == BTTranslationRequestInfo_State.ACTIVE
+		) {
+			console.log('Translation not ready, waiting 500ms');
+			await delay(500);
+			transRes = await this.Translations_GetInfo(
+				(transRes as BTTranslationRequestInfo).id as string
+			); //try in loop
+		}
+
+		console.log('Data', transRes as BTTranslationRequestInfo);
+
+		const resultElementIds = (transRes as BTTranslationRequestInfo)?.resultElementIds;
+		if (!(resultElementIds && resultElementIds.length))
+			//undefined or 0 or 1
+			throw new Error('No resultElementIds');
+
+		return await this.BlobElements_Download(
+			documentId,
+			(transRes as BTTranslationRequestInfo).workspaceId || '',
+			resultElementIds[0]
+		);
 	}
 }

@@ -101,9 +101,14 @@
                             }}
                                 >Inspect
                                 </button>
-                                {#if element.type == "Assembly"}
+                                {#if key == "Assembly"}
                                     <a href="/onshape/bom?did={doc.id}&wid={doc.defaultWorkspace.id}&eid={element.id}"
                                        class="btn btn-primary btn-sm">Bom</a>
+                                {:else if key == "Drawing"}
+                                    <a href="/onshape/drawing?did={doc.id}&wid={doc.defaultWorkspace.id}&eid={element.id}"
+                                       class="btn btn-primary btn-sm">View</a>
+                                    <a href="/onshape/drawing/download?did={doc.id}&wid={doc.defaultWorkspace.id}&eid={element.id}"
+                                       class="btn btn-warning btn-sm">Download</a>
                                 {/if}
                                 {element.name}
                             </li>
