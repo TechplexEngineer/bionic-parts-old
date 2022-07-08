@@ -1,6 +1,6 @@
-import type { RequestHandler, RequestHandlerOutput } from '@sveltejs/kit';
-import OnshapeApi, { WVM } from '$lib/onshape';
-import type { GetBillOfMaterialsResponse } from '$lib/onshape/GetBillOfMaterialsResponse';
+import type {RequestHandler, RequestHandlerOutput} from '@sveltejs/kit';
+import OnshapeApi, {WVM} from '$lib/onshape';
+import type {GetBillOfMaterialsResponse} from '$lib/onshape/GetBillOfMaterialsResponse';
 
 const accessKey = import.meta.env.VITE_ONSHAPE_ACCESS_KEY;
 const secretKey = import.meta.env.VITE_ONSHAPE_SECRET_KEY;
@@ -13,9 +13,9 @@ export const Onshape = new OnshapeApi({
 
 /** @type {import('./__types/index').RequestHandler} */
 export const get: RequestHandler = async ({
-	locals,
-	url
-}): Promise<RequestHandlerOutput<{ bom: GetBillOfMaterialsResponse }>> => {
+											  locals,
+											  url
+										  }): Promise<RequestHandlerOutput<{ bom: GetBillOfMaterialsResponse }>> => {
 	console.log('GET projects', locals, url.searchParams);
 
 	// const did = 'f2dd281fff1cee4d67627c2e'; //toolbox drawer
@@ -29,9 +29,18 @@ export const get: RequestHandler = async ({
 		return {};
 	}
 
+	const res = await Onshape.GetOrCreateBillOfMaterials(did, wid, eid);
+	if ('status' in res && res.status / 100 != 2) {
+		console.log('Error! Unable to create BOM', res);
+		return {
+			status: 404
+		};
+	}
+
+
 	const bom = await Onshape.GetBillOfMaterials(did, WVM.W, wid, eid);
 	if ('status' in bom && bom.status / 100 != 2) {
-		console.log('Error!');
+		console.log('Error!', bom);
 		return {
 			status: 404
 		};

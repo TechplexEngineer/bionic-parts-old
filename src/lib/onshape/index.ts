@@ -389,6 +389,21 @@ export default class Onshape {
 		return (await this.get(opts as any)) as any;
 	}
 
+	public async GetOrCreateBillOfMaterials(
+		documentId: string,
+		workspaceId: string,
+		elementId: string
+	): Promise<GetBillOfMaterialsResponse | ErrorResponse> {
+		const opts: GetOpts = {
+			d: documentId,
+			w: workspaceId,
+			e: elementId,
+			resource: 'assemblies',
+			subresource: 'bomelement'
+		};
+		return (await this.post(opts as any)) as any;
+	}
+
 	public async GetPartStudioStl(
 		documentId: string,
 		wvm: WVM,
