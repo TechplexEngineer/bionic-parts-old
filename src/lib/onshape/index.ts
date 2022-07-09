@@ -7,6 +7,7 @@ import type {
 } from './GetElementsInDocument';
 import type { BTTranslateFormatParams, BTTranslationRequestInfo } from './BTTranslationRequestInfo';
 import { BTTranslationRequestInfo_State } from './BTTranslationRequestInfo';
+import type { GetBillOfMaterialsOptions } from './GetBillOfMaterialsOptions';
 
 async function signDataHmac265_broken_for_post(key: string, data: string): Promise<string> {
 	// encoder to convert string to Uint8Array
@@ -408,16 +409,18 @@ export default class Onshape {
 		documentId: string,
 		wvm: WVM,
 		wvmId: string,
-		elementId: string
+		elementId: string,
+		options: GetBillOfMaterialsOptions = {}
 	): Promise<GetBillOfMaterialsResponse | ErrorResponse> {
 		const opts: GetOpts = {
 			d: documentId,
 			e: elementId,
 			resource: 'assemblies',
-			subresource: 'bom'
+			subresource: 'bom',
+			query: options as { [key: string]: string }
 		};
 		opts[wvm] = wvmId;
-		return (await this.get(opts as any)) as any;
+		return (await this.get(opts)) as GetBillOfMaterialsResponse | ErrorResponse;
 	}
 
 	public async GetOrCreateBillOfMaterials(

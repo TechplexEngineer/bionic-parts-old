@@ -59,7 +59,7 @@
             <h1>Onshape</h1>
         </div>
         <div class="col-2">
-            <div class="btn btn-success" on:click={newProjectModalToggle}>New Project</div>
+            <a href="https://cad.onshape.com/documents/{doc.id}/w/{doc.defaultWorkspace.id}" class="btn btn-success" target="_blank">Open In Onshape</a>
         </div>
     </div>
 
@@ -97,10 +97,11 @@
                         {#each elements as element}
                             <li class="mt-2">
                                 <button class="btn btn-sm btn-secondary" on:click={()=>{
-                                textareaValue = JSON.stringify(element, null, 4)
-                            }}
+                                    textareaValue = JSON.stringify(element, null, 4)
+                                }}
                                 >Inspect
                                 </button>
+                                <a href="https://cad.onshape.com/documents/{doc.id}/w/{doc.defaultWorkspace.id}/e/{element.id}" target="_blank" class="btn btn-success btn-sm">Open In Onshape</a>
                                 {#if key == "Assembly"}
                                     <a href="/onshape/bom?did={doc.id}&wid={doc.defaultWorkspace.id}&eid={element.id}"
                                        class="btn btn-primary btn-sm">Bom</a>
@@ -122,41 +123,7 @@
         </div>
     </div>
 
-    <Modal body header="Create new Project" isOpen={newProjectModalOpen} toggle={newProjectModalToggle}>
-        <form
-                class="new"
-                action="/projects"
-                method="post"
-                enctype="multipart/form-data"
-                use:enhance={{
-                result: async ({ form }) => {
-                    console.log("result", form);
-                    form.reset();
-                    newProjectModalToggle();
-                }
-            }}
-        >
-            <div class="mb-3">
-                <label for="projectName" class="form-label">Name *</label>
-                <input type="text" class="form-control" id="projectName" name="projectName" required>
-            </div>
 
-            <div class="mb-3">
-                <label for="partPrefix" class="form-label">Part Number Prefix *</label>
-                <input type="text" class="form-control" id="partPrefix" name="partPrefix" required>
-            </div>
-
-            <div class="mb-3">
-                <label for="projectPhoto" class="form-label">Cover Image</label>
-                <input class="form-control" type="file" name="projectPhoto" id="projectPhoto">
-            </div>
-
-            <div class="col-auto">
-                <button type="submit" class="btn btn-success mb-3 float-end">Create</button>
-            </div>
-
-        </form>
-    </Modal>
 </section>
 
 <style>

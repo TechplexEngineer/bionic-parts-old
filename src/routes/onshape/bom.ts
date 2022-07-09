@@ -29,15 +29,19 @@ export const get: RequestHandler = async ({
 		return {};
 	}
 
-	const res = await Onshape.GetOrCreateBillOfMaterials(did, wid, eid);
-	if ('status' in res && res.status / 100 != 2) {
-		console.log('Error! Unable to create BOM', res);
-		return {
-			status: 404
-		};
-	}
+	// const res = await Onshape.GetOrCreateBillOfMaterials(did, wid, eid);
+	// if ('status' in res && res.status / 100 != 2) {
+	// 	console.log('Error! Unable to create BOM', res);
+	// 	return {
+	// 		status: 404
+	// 	};
+	// }
 
-	const bom = await Onshape.GetBillOfMaterials(did, WVM.W, wid, eid);
+	const bom = await Onshape.GetBillOfMaterials(did, WVM.W, wid, eid, {
+		generateIfAbsent: true,
+		indented: true,
+		multiLevel: true
+	});
 	if ('status' in bom && bom.status / 100 != 2) {
 		console.log('Error!', bom);
 		return {
