@@ -1,5 +1,4 @@
-import { createHmac } from 'node:crypto';
-import { URLSearchParams } from 'node:url';
+// import { createHmac } from 'node:crypto';
 import type { GetDocumentResponse } from './GetDocumentResponse';
 import type { GetBillOfMaterialsResponse } from './GetBillOfMaterialsResponse';
 import type {
@@ -8,6 +7,39 @@ import type {
 } from './GetElementsInDocument';
 import type { BTTranslateFormatParams, BTTranslationRequestInfo } from './BTTranslationRequestInfo';
 import { BTTranslationRequestInfo_State } from './BTTranslationRequestInfo';
+
+async function signDataHmac265(key: string, data: string): Promise<string> {
+	// encoder to convert string to Uint8Array
+	const enc = new TextEncoder();
+
+	const hmac512 = await window.crypto.subtle.importKey(
+		'raw', // raw format of the key - should be Uint8Array
+		enc.encode(key),
+		{
+			// algorithm details
+			name: 'HMAC',
+			hash: { name: 'SHA-512' }
+		},
+		false, // export = false
+		['sign', 'verify'] // what this key can do
+	);
+
+	const signature = await window.crypto.subtle.sign('HMAC', hmac512, enc.encode(data));
+	const b = new Uint8Array(signature);
+	return Array.prototype.map.call(b, (x) => x.toString(16).padStart(2, '0')).join('');
+}
+
+// async function signDataHmac265_old(key: string, data: string): Promise<string> {
+// 	const hmac = createHmac('sha256', key);
+// 	hmac.update(data);
+// 	return hmac.digest('base64');
+// }
+
+// function signDataHmac265(key:string, data:string): string {
+// 	const hmac = createHmac('sha256', key);
+// 	hmac.update(data);
+// 	return hmac.digest('base64');
+// }
 
 /**
  * Wrapper for setTimeout to create delays
@@ -243,7 +275,7 @@ export default class Onshape {
 		}
 	}
 
-	private buildHeaders(method: string, path: string, queryString: string, inputHeaders: any) {
+	private async buildHeaders(method: string, path: string, queryString: string, inputHeaders: any) {
 		const headers = copyObject(inputHeaders);
 		// the Date header needs to be reasonably (5 minutes) close to the server time when the request is received
 		const authDate = new Date().toUTCString();
@@ -268,9 +300,8 @@ export default class Onshape {
 			queryString +
 			'\n'
 		).toLowerCase();
-		const hmac = createHmac('sha256', this.creds.secretKey);
-		hmac.update(hmacString);
-		const signature = hmac.digest('base64');
+		const signature = await signDataHmac265(this.creds.secretKey, hmacString);
+
 		const asign = 'On ' + this.creds.accessKey + ':HmacSHA256:' + signature;
 
 		headers['On-Nonce'] = onNonce;
@@ -310,7 +341,7 @@ export default class Onshape {
 		const baseUrl = 'baseUrl' in opts ? opts.baseUrl : this.creds.baseUrl;
 		const inputHeaders = inputHeadersFromOpts(opts as any);
 		let queryString = buildQueryString(opts as any);
-		const headers = this.buildHeaders('GET', path, queryString, inputHeaders);
+		const headers = await this.buildHeaders('GET', path, queryString, inputHeaders);
 		if (queryString !== '') queryString = '?' + queryString;
 		const requestUrl = baseUrl + path + queryString;
 		if (this.creds.debug) {
@@ -436,7 +467,7 @@ export default class Onshape {
 		const baseUrl = 'baseUrl' in opts ? opts.baseUrl : this.creds.baseUrl;
 		const inputHeaders = inputHeadersFromOpts(opts as any);
 		let queryString = buildQueryString(opts as any);
-		const headers = this.buildHeaders(method, path, queryString, inputHeaders);
+		const headers = await this.buildHeaders(method, path, queryString, inputHeaders);
 		if (queryString !== '') queryString = '?' + queryString;
 		const requestUrl = baseUrl + path + queryString;
 		if (this.creds.debug) {
