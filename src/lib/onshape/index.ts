@@ -12,7 +12,7 @@ async function signDataHmac265(key: string, data: string): Promise<string> {
 	// encoder to convert string to Uint8Array
 	const enc = new TextEncoder();
 
-	const hmac512 = await window.crypto.subtle.importKey(
+	const hmac512 = await crypto.subtle.importKey(
 		'raw', // raw format of the key - should be Uint8Array
 		enc.encode(key),
 		{
@@ -24,7 +24,7 @@ async function signDataHmac265(key: string, data: string): Promise<string> {
 		['sign', 'verify'] // what this key can do
 	);
 
-	const signature = await window.crypto.subtle.sign('HMAC', hmac512, enc.encode(data));
+	const signature = await crypto.subtle.sign('HMAC', hmac512, enc.encode(data));
 	const b = new Uint8Array(signature);
 	return Array.prototype.map.call(b, (x) => x.toString(16).padStart(2, '0')).join('');
 }
