@@ -1,4 +1,4 @@
-// import { createHmac } from 'node:crypto';
+import { createHmac } from 'node:crypto';
 import type { GetDocumentResponse } from './GetDocumentResponse';
 import type { GetBillOfMaterialsResponse } from './GetBillOfMaterialsResponse';
 import type {
@@ -8,7 +8,7 @@ import type {
 import type { BTTranslateFormatParams, BTTranslationRequestInfo } from './BTTranslationRequestInfo';
 import { BTTranslationRequestInfo_State } from './BTTranslationRequestInfo';
 
-async function signDataHmac265(key: string, data: string): Promise<string> {
+async function signDataHmac265_broken_for_post(key: string, data: string): Promise<string> {
 	// encoder to convert string to Uint8Array
 	const enc = new TextEncoder();
 
@@ -29,7 +29,7 @@ async function signDataHmac265(key: string, data: string): Promise<string> {
 	// return Array.prototype.map.call(b, (x) => x.toString().padStart(2, '0')).join('');
 }
 
-async function signDataHmac265_(key: string, data: string): Promise<string> {
+async function signDataHmac265(key: string, data: string): Promise<string> {
 	const hmac = createHmac('sha256', key);
 	hmac.update(data);
 	return hmac.digest('base64');
