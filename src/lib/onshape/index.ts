@@ -25,15 +25,15 @@ async function signDataHmac265(key: string, data: string): Promise<string> {
 	);
 
 	const signature = await crypto.subtle.sign('HMAC', hmac512, enc.encode(data));
-	const b = new Uint8Array(signature);
-	return Array.prototype.map.call(b, (x) => x.toString(16).padStart(2, '0')).join('');
+	return Buffer.from(signature).toString('base64');
+	// return Array.prototype.map.call(b, (x) => x.toString().padStart(2, '0')).join('');
 }
 
-// async function signDataHmac265_old(key: string, data: string): Promise<string> {
-// 	const hmac = createHmac('sha256', key);
-// 	hmac.update(data);
-// 	return hmac.digest('base64');
-// }
+async function signDataHmac265_(key: string, data: string): Promise<string> {
+	const hmac = createHmac('sha256', key);
+	hmac.update(data);
+	return hmac.digest('base64');
+}
 
 // function signDataHmac265(key:string, data:string): string {
 // 	const hmac = createHmac('sha256', key);
