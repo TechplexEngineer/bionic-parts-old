@@ -535,4 +535,26 @@ export default class Onshape {
 			resultElementIds[0]
 		);
 	}
+
+	public async GetElementMetadata() {
+		//	/metadata/d/{did}/{wvm}/{wvmid}/e/{eid}
+	}
+
+	public async GetOutOfDateElements(
+		documentId: string,
+		workspaceId: string,
+		elementId: string,
+		options?: { microversionId?: string }
+	): Promise<Response> {
+		const opts: GetOpts = {
+			d: documentId,
+			w: workspaceId,
+			e: elementId,
+			resource: 'documents',
+			subresource: 'outofdatedelements',
+			query: options,
+			rawResponse: true
+		};
+		return (await this.get(opts as any)) as any;
+	}
 }
