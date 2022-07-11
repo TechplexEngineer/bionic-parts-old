@@ -45,6 +45,9 @@
         }, {
             name: "2022 Rapid React Robot - Top Level",
             did: "ef5af647c02e3b8511615776"
+        }, {
+            name: "Earrings & Merch",
+            did: "5ef9baf0427d5ecee3945852"
         }
     ]
 </script>

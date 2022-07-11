@@ -1,5 +1,4 @@
 import { createHmac } from 'node:crypto';
-import { URLSearchParams } from 'node:url';
 import type { GetDocumentResponse } from './GetDocumentResponse';
 import type { GetBillOfMaterialsResponse } from './GetBillOfMaterialsResponse';
 import type {
@@ -8,6 +7,40 @@ import type {
 } from './GetElementsInDocument';
 import type { BTTranslateFormatParams, BTTranslationRequestInfo } from './BTTranslationRequestInfo';
 import { BTTranslationRequestInfo_State } from './BTTranslationRequestInfo';
+import type { GetBillOfMaterialsOptions } from './GetBillOfMaterialsOptions';
+
+async function signDataHmac265_broken_for_post(key: string, data: string): Promise<string> {
+	// encoder to convert string to Uint8Array
+	const enc = new TextEncoder();
+
+	const hmac512 = await crypto.subtle.importKey(
+		'raw', // raw format of the key - should be Uint8Array
+		enc.encode(key),
+		{
+			// algorithm details
+			name: 'HMAC',
+			hash: { name: 'SHA-512' }
+		},
+		false, // export = false
+		['sign', 'verify'] // what this key can do
+	);
+
+	const signature = await crypto.subtle.sign('HMAC', hmac512, enc.encode(data));
+	return Buffer.from(signature).toString('base64');
+	// return Array.prototype.map.call(b, (x) => x.toString().padStart(2, '0')).join('');
+}
+
+async function signDataHmac265(key: string, data: string): Promise<string> {
+	const hmac = createHmac('sha256', key);
+	hmac.update(data);
+	return hmac.digest('base64');
+}
+
+// function signDataHmac265(key:string, data:string): string {
+// 	const hmac = createHmac('sha256', key);
+// 	hmac.update(data);
+// 	return hmac.digest('base64');
+// }
 
 /**
  * Wrapper for setTimeout to create delays
@@ -243,7 +276,7 @@ export default class Onshape {
 		}
 	}
 
-	private buildHeaders(method: string, path: string, queryString: string, inputHeaders: any) {
+	private async buildHeaders(method: string, path: string, queryString: string, inputHeaders: any) {
 		const headers = copyObject(inputHeaders);
 		// the Date header needs to be reasonably (5 minutes) close to the server time when the request is received
 		const authDate = new Date().toUTCString();
@@ -268,9 +301,8 @@ export default class Onshape {
 			queryString +
 			'\n'
 		).toLowerCase();
-		const hmac = createHmac('sha256', this.creds.secretKey);
-		hmac.update(hmacString);
-		const signature = hmac.digest('base64');
+		const signature = await signDataHmac265(this.creds.secretKey, hmacString);
+
 		const asign = 'On ' + this.creds.accessKey + ':HmacSHA256:' + signature;
 
 		headers['On-Nonce'] = onNonce;
@@ -310,7 +342,7 @@ export default class Onshape {
 		const baseUrl = 'baseUrl' in opts ? opts.baseUrl : this.creds.baseUrl;
 		const inputHeaders = inputHeadersFromOpts(opts as any);
 		let queryString = buildQueryString(opts as any);
-		const headers = this.buildHeaders('GET', path, queryString, inputHeaders);
+		const headers = await this.buildHeaders('GET', path, queryString, inputHeaders);
 		if (queryString !== '') queryString = '?' + queryString;
 		const requestUrl = baseUrl + path + queryString;
 		if (this.creds.debug) {
@@ -377,16 +409,18 @@ export default class Onshape {
 		documentId: string,
 		wvm: WVM,
 		wvmId: string,
-		elementId: string
+		elementId: string,
+		options: GetBillOfMaterialsOptions = {}
 	): Promise<GetBillOfMaterialsResponse | ErrorResponse> {
 		const opts: GetOpts = {
 			d: documentId,
 			e: elementId,
 			resource: 'assemblies',
-			subresource: 'bom'
+			subresource: 'bom',
+			query: options as { [key: string]: string }
 		};
 		opts[wvm] = wvmId;
-		return (await this.get(opts as any)) as any;
+		return (await this.get(opts)) as GetBillOfMaterialsResponse | ErrorResponse;
 	}
 
 	public async GetOrCreateBillOfMaterials(
@@ -436,7 +470,7 @@ export default class Onshape {
 		const baseUrl = 'baseUrl' in opts ? opts.baseUrl : this.creds.baseUrl;
 		const inputHeaders = inputHeadersFromOpts(opts as any);
 		let queryString = buildQueryString(opts as any);
-		const headers = this.buildHeaders(method, path, queryString, inputHeaders);
+		const headers = await this.buildHeaders(method, path, queryString, inputHeaders);
 		if (queryString !== '') queryString = '?' + queryString;
 		const requestUrl = baseUrl + path + queryString;
 		if (this.creds.debug) {
