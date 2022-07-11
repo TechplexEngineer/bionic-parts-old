@@ -34,7 +34,7 @@
         "Vendor"
     ].map(i => i.toLowerCase());
 
-    const filters: { [propertyId: string]: Header } = headers.reduce((prev, cur)=>{
+    const colFilters: { [propertyId: string]: Header } = headers.reduce((prev, cur)=>{
         if (hiddenProperty.includes(cur.name.toLowerCase())) {
             return prev;
         }
@@ -44,11 +44,28 @@
         return prev
     }, {});
 
+    const validStatuses = [
+        "Design in progress",
+        "Waiting for materials",
+        "Ready to manufacture",
+        "Manufacturing in progress",
+        "Waiting for assembly",
+        "Done",
+
+    ]
 
 
-
-
-    let textareaValue = "";
+    let filters = [
+        {
+            name: "Assemblies Only",
+            enabled: false
+        },
+        {
+            name: "COTS only",
+            enabled: false
+        }
+    ];
+    filters = filters.concat(validStatuses.map(s => ({name: `Status: ${s}`, enabled: false})))
 </script>
 
 
@@ -67,18 +84,34 @@
     </div>
 
     <div>
-        <h3>Filters</h3>
+        <h3>Column Filters</h3>
         <div class="row">
-            {#each Object.values(filters) as {name, visible, propertyId}, idx}
-                <div class="col">
+            {#each Object.values(colFilters) as {name, visible, propertyId}, idx}
+                <div class="col-md-3">
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="check-{idx}" bind:checked={filters[propertyId].visible}>
-                        <label class="form-check-label" for="check-{idx}">
+                        <input class="form-check-input" type="checkbox" id="col-check-{idx}" bind:checked={colFilters[propertyId].visible}>
+                        <label class="form-check-label" for="col-check-{idx}">
                             {name}
                         </label>
                     </div>
                 </div>
             {/each}
+        </div>
+    </div>
+
+    <div>
+        <h3>Filters</h3>
+        <div class="row">
+        {#each filters as f, idx}
+            <div class="col-md-4">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="check-{idx}" bind:checked={f.enabled}>
+                    <label class="form-check-label" for="check-{idx}">
+                        {f.name}
+                    </label>
+                </div>
+            </div>
+        {/each}
         </div>
     </div>
 
@@ -92,7 +125,7 @@
         <thead>
             <tr>
                 {#each headers as hdr}
-                    {#if filters[hdr.propertyId]?.visible}
+                    {#if colFilters[hdr.propertyId]?.visible}
                     <th title="{hdr.propertyName}">
                         {hdr.name}
                     </th>
@@ -104,7 +137,7 @@
             {#each bom.bomTable.items as item, idx}
                 <tr>
                     {#each headers as hdr}
-                        {#if filters[hdr.propertyId]?.visible} <!--could be written as a filter-->
+                        {#if colFilters[hdr.propertyId]?.visible} <!--could be written as a filter-->
                         <td>
                             {#if hdr.propertyName == "material" && item[hdr.propertyName] != "N/A"}
                                 <abbr title="{item[hdr.propertyName].libraryName}">{item[hdr.propertyName].displayName}</abbr>

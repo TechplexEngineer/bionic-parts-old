@@ -31,16 +31,16 @@
         return prev
     }, {});
 
-    const defaultHidden = ["Bill Of Materials", "Part Studio", "Application"];
+    const defaultShow = ["Assembly", "Drawing"];
 
     const filters: { [key: string]: boolean } = Object.keys(elementsByType).reduce((prev, type) => {
         prev[type] = false;
         // return {[type]: false}
         return prev
     }, {});
-    console.log(filters);
+    // console.log(filters);
     for (let filterType in filters) {
-        filters[filterType] = !defaultHidden.includes(filterType);
+        filters[filterType] = defaultShow.includes(filterType);
     }
 
     let newProjectModalOpen = false;
