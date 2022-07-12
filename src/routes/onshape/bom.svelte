@@ -51,9 +51,7 @@
         "Manufacturing in progress",
         "Waiting for assembly",
         "Done",
-
-    ]
-
+    ];
 
     let filters = [
         {

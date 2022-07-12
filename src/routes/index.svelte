@@ -8,20 +8,26 @@
 	let projects = [
 		{
 			name: "Rapid React",
-			partNumberPrefix: "22"
+			partNumberPrefix: "22",
+			onshapeDID: "ef5af647c02e3b8511615776"
 		},
 		{
-			name: "N.E.R.D.",
-			partNumberPrefix: "NERD"
-		},
-		{
-			name: "TShirt Cannon",
-			partNumberPrefix: "TSHIRT"
-		},
-		{
-			name: "Powder Coating Oven",
-			partNumberPrefix: "oven"
+			name: "Infinite Recharge v2",
+			partNumberPrefix: "21",
+			onshapeDID: "1333577c52d5bda83cdec384"
 		}
+		// {
+		// 	name: "N.E.R.D.",
+		// 	partNumberPrefix: "NERD"
+		// },
+		// {
+		// 	name: "TShirt Cannon",
+		// 	partNumberPrefix: "TSHIRT"
+		// },
+		// {
+		// 	name: "Powder Coating Oven",
+		// 	partNumberPrefix: "oven"
+		// }
 	];
 </script>
 

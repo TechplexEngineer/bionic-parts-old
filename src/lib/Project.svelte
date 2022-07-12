@@ -10,20 +10,14 @@
 		<h2 class="pt-5 mt-5 mb-4 display-6 lh-1 fw-bold text-white">{project.name}</h2>
 		<ul class="d-flex list-unstyled mt-auto">
 			<li class="me-auto">
-<!--				<img-->
-<!--					src="https://github.com/twbs.png"-->
-<!--					alt="Bootstrap"-->
-<!--					width="32"-->
-<!--					height="32"-->
-<!--					class="rounded-circle border border-white"-->
-<!--				/>-->
+				<a class="btn btn-primary stretched-link" href="#">Dashboard</a>
 			</li>
 <!--			<li class="d-flex align-items-center me-3">-->
 <!--				<svg class="bi me-2" width="1em" height="1em"><use xlink:href="#geo-fill" /></svg>-->
 <!--				<small>Earth</small>-->
 <!--			</li>-->
 			<li class="d-flex align-items-center">
-				<small>{project.partNumberPrefix}</small>
+				{project.partNumberPrefix}
 			</li>
 		</ul>
 	</div>
