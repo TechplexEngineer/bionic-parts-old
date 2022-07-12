@@ -7,8 +7,8 @@
     import Project from '$lib/Project.svelte';
     import {Modal} from "sveltestrap";
     import {enhance} from '$lib/form';
-    import type {GetDocumentResponse} from "$lib/onshape/GetDocumentResponse";
-    import type {GetElementsInDocumentResponse} from '$lib/onshape/GetElementsInDocument';
+    import type {GetDocumentResponse} from "$lib/OnshapeAPI/GetDocumentResponse";
+    import type {GetElementsInDocumentResponse} from '$lib/OnshapeAPI/GetElementsInDocument';
 
     // populated with data from the get endpoint
 
@@ -19,7 +19,7 @@
     let elementsByType = elements.reduce((prev, cur) => {
 
         let type = cur.type;
-        if (cur.type.toLowerCase() == "application" && cur.dataType == "onshape-app/drawing") {
+        if (cur.type.toLowerCase() == "application" && cur.dataType == "OnshapeAPI-app/drawing") {
             type = "Drawing";
         }
 
@@ -59,7 +59,8 @@
             <h1>Onshape</h1>
         </div>
         <div class="col-2">
-            <a href="https://cad.onshape.com/documents/{doc.id}/w/{doc.defaultWorkspace.id}" class="btn btn-success" target="_blank">Open In Onshape</a>
+            <a href="https://cad.onshape.com/documents/{doc.id}/w/{doc.defaultWorkspace.id}" class="btn btn-success"
+               target="_blank">Open In Onshape</a>
         </div>
     </div>
 
@@ -101,7 +102,8 @@
                                 }}
                                 >Inspect
                                 </button>
-                                <a href="https://cad.onshape.com/documents/{doc.id}/w/{doc.defaultWorkspace.id}/e/{element.id}" target="_blank" class="btn btn-success btn-sm">Open In Onshape</a>
+                                <a href="https://cad.onshape.com/documents/{doc.id}/w/{doc.defaultWorkspace.id}/e/{element.id}"
+                                   target="_blank" class="btn btn-success btn-sm">Open In Onshape</a>
                                 {#if key == "Assembly"}
                                     <a href="/onshape/bom?did={doc.id}&wid={doc.defaultWorkspace.id}&eid={element.id}"
                                        class="btn btn-primary btn-sm">Bom</a>

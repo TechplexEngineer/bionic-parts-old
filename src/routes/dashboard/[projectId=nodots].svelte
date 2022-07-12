@@ -1,6 +1,9 @@
 <script lang="ts">
 
     import Select from "svelte-select";
+    import type {Project} from "../../lib/projects";
+
+    export let project: Project;
 
     let partStatuses = [
         "Design",
@@ -24,7 +27,7 @@
         </div>
     </div>
     <div class="col-6">
-        <h1>Project Status Dashboard</h1>
+        <h1><small>Project Status:</small> {project.name}</h1>
     </div>
     <div class="col-3">
         <!-- Some Other Action -->

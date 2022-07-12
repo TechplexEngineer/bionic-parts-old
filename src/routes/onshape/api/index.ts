@@ -1,6 +1,6 @@
 import type { RequestHandler, RequestHandlerOutput } from '@sveltejs/kit';
-import OnshapeApi, { WVM } from '$lib/onshape';
-import type { GetBillOfMaterialsResponse } from '$lib/onshape/GetBillOfMaterialsResponse';
+import OnshapeApi, { WVM } from '$lib/OnshapeAPI';
+import type { GetBillOfMaterialsResponse } from '$lib/OnshapeAPI/GetBillOfMaterialsResponse';
 
 const accessKey = import.meta.env.VITE_ONSHAPE_ACCESS_KEY;
 const secretKey = import.meta.env.VITE_ONSHAPE_SECRET_KEY;

@@ -1,10 +1,5 @@
-import type { RequestHandler, RequestHandlerOutput } from '@sveltejs/kit';
-import OnshapeApi, { WVM } from '$lib/onshape';
-import type { GetDocumentResponse } from '$lib/onshape/GetDocumentResponse';
-import type {
-	GetElementsInDocumentOptional,
-	GetElementsInDocumentResponse
-} from '$lib/onshape/GetElementsInDocument';
+import OnshapeApi, { WVM } from '$lib/OnshapeAPI';
+import type { GetElementsInDocumentOptional } from '$lib/OnshapeAPI/GetElementsInDocument';
 
 const accessKey = import.meta.env.VITE_ONSHAPE_ACCESS_KEY;
 const secretKey = import.meta.env.VITE_ONSHAPE_SECRET_KEY;
@@ -14,6 +9,8 @@ export const Onshape = new OnshapeApi({
 	secretKey: secretKey,
 	debug: false
 });
+
+import type { RequestHandler } from './__types/[did=isOnshapeId]';
 
 export const get: RequestHandler = async ({ locals, url, params }) => {
 	console.log('GET projects', locals, params.did);
@@ -30,7 +27,10 @@ export const get: RequestHandler = async ({ locals, url, params }) => {
 	}
 
 	const doc = await Onshape.GetDocument(did);
-	// console.log(JSON.stringify(doc, null, '\t'));
+	if ('status' in doc && doc.status / 100 != 2) {
+		throw new Error('Unable to create translation: ' + JSON.stringify(doc));
+	}
+	console.log(JSON.stringify(doc, null, '\t'));
 	const wid = doc.defaultWorkspace.id;
 
 	const elementTypeFilter = url.searchParams.get('type');

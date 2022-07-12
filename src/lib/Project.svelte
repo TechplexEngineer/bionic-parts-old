@@ -1,5 +1,8 @@
 <script lang="ts">
-	export let project: { name: string, photo: string, partNumberPrefix: string };
+
+	import type {Project} from "./projects";
+
+	export let project: Project;
 </script>
 
 <div
@@ -10,14 +13,14 @@
 		<h2 class="pt-5 mt-5 mb-4 display-6 lh-1 fw-bold text-white">{project.name}</h2>
 		<ul class="d-flex list-unstyled mt-auto">
 			<li class="me-auto">
-				<a class="btn btn-primary stretched-link" href="#">Dashboard</a>
+				<a class="btn btn-primary stretched-link" href="/dashboard/{project.slug}">Dashboard</a>
 			</li>
 <!--			<li class="d-flex align-items-center me-3">-->
 <!--				<svg class="bi me-2" width="1em" height="1em"><use xlink:href="#geo-fill" /></svg>-->
 <!--				<small>Earth</small>-->
 <!--			</li>-->
 			<li class="d-flex align-items-center">
-				{project.partNumberPrefix}
+				{project.slug}
 			</li>
 		</ul>
 	</div>

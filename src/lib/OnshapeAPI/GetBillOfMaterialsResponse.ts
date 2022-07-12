@@ -44,7 +44,7 @@ export interface Header {
 	name: string; // human readable name like "Part Number"
 	propertyName: string; //camel case name like "partNumber"
 	visible: boolean;
-	propertyId: string; //typical onshape id hex string, 24chars
+	propertyId: string; //typical OnshapeAPI id hex string, 24chars
 }
 
 export interface Item {

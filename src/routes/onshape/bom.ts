@@ -1,6 +1,5 @@
-import type { RequestHandler, RequestHandlerOutput } from '@sveltejs/kit';
-import OnshapeApi, { WVM } from '$lib/onshape';
-import type { GetBillOfMaterialsResponse } from '$lib/onshape/GetBillOfMaterialsResponse';
+import OnshapeApi, { WVM } from '$lib/OnshapeAPI';
+import type { GetBillOfMaterialsResponse } from '$lib/OnshapeAPI/GetBillOfMaterialsResponse';
 
 const accessKey = import.meta.env.VITE_ONSHAPE_ACCESS_KEY;
 const secretKey = import.meta.env.VITE_ONSHAPE_SECRET_KEY;
@@ -11,11 +10,9 @@ export const Onshape = new OnshapeApi({
 	debug: true
 });
 
-/** @type {import('./__types/index').RequestHandler} */
-export const get: RequestHandler = async ({
-	locals,
-	url
-}): Promise<RequestHandlerOutput<{ bom: GetBillOfMaterialsResponse }>> => {
+import type { RequestHandler } from './__types/bom';
+
+export const get: RequestHandler = async ({ locals, url }) => {
 	console.log('GET bom', locals, url.searchParams);
 
 	// const did = 'f2dd281fff1cee4d67627c2e'; //toolbox drawer

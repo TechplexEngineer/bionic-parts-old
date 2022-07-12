@@ -257,7 +257,7 @@ export enum DrawingExportType {
 	SVG = 'SVG'
 }
 
-export default class Onshape {
+export default class OnshapeAPI {
 	private creds: OnshapeApiCreds;
 
 	constructor(creds: OnshapeApiCreds) {
@@ -310,7 +310,7 @@ export default class Onshape {
 		headers['Authorization'] = asign;
 
 		if (!('Accept' in headers)) {
-			headers['Accept'] = 'application/vnd.onshape.v1+json';
+			headers['Accept'] = 'application/vnd.OnshapeAPI.v1+json';
 		}
 
 		return headers;
@@ -327,7 +327,7 @@ export default class Onshape {
 	 *   resource: top-level resource (partstudios)
 	 *   subresource: sub-resource, if any (massproperties)
 	 *   path: from /api/...; if present, overrides the other options
-	 *   accept: accept header (default: application/vnd.onshape.v1+json)
+	 *   accept: accept header (default: application/vnd.OnshapeAPI.v1+json)
 	 *   query: query object
 	 *   headers: headers object
 	 * }
@@ -358,7 +358,7 @@ export default class Onshape {
 		return await res.json();
 	}
 
-	public async GetDocument(documentId: string): Promise<GetDocumentResponse> {
+	public async GetDocument(documentId: string): Promise<GetDocumentResponse | ErrorResponse> {
 		const opts: GetOpts = {
 			path: `/api/documents/${documentId}`
 		};
@@ -452,7 +452,7 @@ export default class Onshape {
 			resource: 'partstudios',
 			subresource: 'stl',
 			headers: {
-				Accept: 'application/vnd.onshape.v1+octet-stream'
+				Accept: 'application/vnd.OnshapeAPI.v1+octet-stream'
 			}
 		};
 		opts[wvm] = wvmId;
@@ -522,7 +522,7 @@ export default class Onshape {
 			e: elementId,
 			resource: 'blobelements',
 			headers: {
-				Accept: 'application/vnd.onshape.v1+octet-stream'
+				Accept: 'application/vnd.OnshapeAPI.v1+octet-stream'
 			},
 			rawResponse: true
 		};

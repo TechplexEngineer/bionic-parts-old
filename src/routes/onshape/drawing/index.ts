@@ -1,5 +1,4 @@
-import type { RequestHandler } from '@sveltejs/kit';
-import OnshapeApi, { DrawingExportType, WVM } from '$lib/onshape';
+import OnshapeApi, { DrawingExportType, WVM } from '$lib/OnshapeAPI';
 
 const accessKey = import.meta.env.VITE_ONSHAPE_ACCESS_KEY;
 const secretKey = import.meta.env.VITE_ONSHAPE_SECRET_KEY;
@@ -10,9 +9,10 @@ export const Onshape = new OnshapeApi({
 	debug: true
 });
 
-/** @type {import('./__types/index').RequestHandler} */
+import type { RequestHandler } from './__types/index';
+
 export const get: RequestHandler = async ({ locals, url }) => {
-	console.log('GET onshape/drawing', locals, url.searchParams);
+	console.log('GET OnshapeAPI/drawing', locals, url.searchParams);
 
 	// const did = 'f2dd281fff1cee4d67627c2e'; //toolbox drawer
 	const did = url.searchParams.get('did');

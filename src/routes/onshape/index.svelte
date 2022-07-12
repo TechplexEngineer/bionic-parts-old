@@ -7,8 +7,8 @@
     import Project from '$lib/Project.svelte';
     import {Modal} from "sveltestrap";
     import {enhance} from '$lib/form';
-    import type {GetDocumentResponse} from "$lib/onshape/GetDocumentResponse";
-    import type { GetElementsInDocumentResponse } from '$lib/onshape/GetElementsInDocument';
+    import type {GetDocumentResponse} from "$lib/OnshapeAPI/GetDocumentResponse";
+    import type {GetElementsInDocumentResponse} from '$lib/OnshapeAPI/GetElementsInDocument';
 
     // populated with data from the get endpoint
 
@@ -18,7 +18,7 @@
     // let elementsByType = elements.reduce((prev, cur)=>{
     //
     //     let type = cur.type;
-    //     if (cur.type.toLowerCase() == "application" && cur.dataType == "onshape-app/drawing") {
+    //     if (cur.type.toLowerCase() == "application" && cur.dataType == "OnshapeAPI-app/drawing") {
     //         type = "Drawing";
     //     }
     //
