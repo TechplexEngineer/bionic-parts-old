@@ -310,7 +310,7 @@ export default class OnshapeAPI {
 		headers['Authorization'] = asign;
 
 		if (!('Accept' in headers)) {
-			headers['Accept'] = 'application/vnd.OnshapeAPI.v1+json';
+			headers['Accept'] = 'application/vnd.onshape.v1+json';
 		}
 
 		return headers;
@@ -327,7 +327,7 @@ export default class OnshapeAPI {
 	 *   resource: top-level resource (partstudios)
 	 *   subresource: sub-resource, if any (massproperties)
 	 *   path: from /api/...; if present, overrides the other options
-	 *   accept: accept header (default: application/vnd.OnshapeAPI.v1+json)
+	 *   accept: accept header (default: application/vnd.onshape.v1+json)
 	 *   query: query object
 	 *   headers: headers object
 	 * }
