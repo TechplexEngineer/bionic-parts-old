@@ -19,7 +19,7 @@ export async function GetProjects(options: { bySlug?: string } = {}): Promise<Pr
 			slug: '21',
 			onshapeDID: '1333577c52d5bda83cdec384',
 			mainAssemblyEid: '9f0992d2d272a76eee69125a'
-		}
+		},
 		// {
 		// 	name: "N.E.R.D.",
 		// 	partNumberPrefix: "NERD"
@@ -32,6 +32,12 @@ export async function GetProjects(options: { bySlug?: string } = {}): Promise<Pr
 		// 	name: "Powder Coating Oven",
 		// 	partNumberPrefix: "oven"
 		// }
+		{
+			name: 'Putney Shed',
+			slug: 'ps',
+			onshapeDID: '62e5c91a5ef9c6c7cc872683',
+			mainAssemblyEid: '50c529be999a4c00a3a1fda7'
+		}
 	];
 	return new Promise((resolve) => {
 		resolve(

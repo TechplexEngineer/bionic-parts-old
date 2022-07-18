@@ -2,20 +2,50 @@
 
     import Select from "svelte-select";
     import type {Project} from "../../lib/projects";
+    import type {GetBillOfMaterialsResponse} from "$lib/OnshapeAPI/GetBillOfMaterialsResponse";
 
     export let project: Project;
+    export let bom: GetBillOfMaterialsResponse;
+    console.log(bom);
+
+    const statePropertyName     = "state"; //title1
+    const mfgMethodPropertyName = "title2"; //title1
+
+    const itemsByStatus = bom.bomTable.items.reduce((previousValue, currentValue) => {
+        if (!Array.isArray(previousValue[currentValue[statePropertyName]])) {
+            previousValue[currentValue[statePropertyName]] = [];
+        }
+        previousValue[currentValue[statePropertyName]].push(currentValue)
+        return previousValue
+    }, {})
 
     let partStatuses = [
-        "Design",
-        "Waiting on Materials",
-        "Waiting on Mfg.",
-        "Mfg. in Progress",
-        "Waiting for Assembly",
-        "Done"
+        "Design",          // ____, doing, done // todo state is missing as card does not exist until part is created
+        "Order",              // todo, doing(ordered), done
+        "Manufacturing",      // todo, doing, finishing?, done
+        "Assembly", // todo, doing, done
+        "Done",
+        "Invalid Status" // if someone typo's one of the statuses
     ];
+
+    // concept of linked kanbans. When complete by first works tation, moves to next work station
+
+    // partStatuses = Object.keys(itemsByStatus) // for testing. Or we will want to sort them
 
     let assemblies = []
     let selectedAssembly;
+
+    const isPart = (item):boolean => {
+        return item.bomBehavior == 'N/A'
+    }
+
+    const getItems = (status) => {
+        if (status == "Invalid Status") {
+            let invalidStatuses = Object.keys(itemsByStatus).filter(s=>!partStatuses.includes(s));
+            return invalidStatuses.map(s=>itemsByStatus[s]).flat();
+        }
+        return itemsByStatus[status] || []
+    }
 </script>
 
 
@@ -34,6 +64,28 @@
     </div>
 </div>
 
+<div class="row">
+    <div class="col">
+        Show as: Tree, individual
+        Show only: parts, assemblies
+    </div>
+</div>
+
+<!--
+    Goals:
+        - Show parts for mfg team
+        - auto generate part numbers
+            - project property on part studio is part number prefix
+            - intake-1234 in the case of many part studios
+            - intake-ps1-1234
+        - overall progress tracking for team
+            - show progress by subsytem
+            - by assembly
+            - by any property
+            - definition of progress:
+                - parts and their status for that subystem
+-->
+
 
 <div class="row">
     {#each partStatuses as status, idx}
@@ -41,6 +93,34 @@
             <div class="card text-dark bg-light mb-3">
                 <div class="card-header">{idx + 1}: {status}</div>
                 <div class="card-body">
+
+                    {#each getItems(status) as item}
+                        <div class="card text-dark bg-light mb-3">
+                            <div class="card-header">{isPart(item)?"Part":"Asm"}
+                                <span class="float-end">{item.item}</span></div>
+                            <div class="card-body">
+
+                                {#if isPart(item)}
+                                    {item.name}
+                                    <span title="Material">Mat: {item.material.libraryName}:{item.material.displayName}</span>
+                                    <span>PN: {item.partNumber}</span>
+                                    <span>MFG: {item[mfgMethodPropertyName]}</span>
+                                {:else}
+                                    <strong>Asm</strong>  {item.name} --
+                                    {item.partNumber}
+                                    {item[mfgMethodPropertyName]}
+                                {/if}
+                            </div>
+                            {#if status == "Invalid Status"}
+                            <div class="card-footer">
+                                ERROR - Invalid Status:<br>{item[statePropertyName]}
+                            </div>
+                            {/if}
+                        </div>
+                    {/each}
+
+
+
 
                 </div>
             </div>
