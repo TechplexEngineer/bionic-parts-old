@@ -2,30 +2,76 @@
 
     import Select from "svelte-select";
     import type {Project} from "../../lib/projects";
-    import type {GetBillOfMaterialsResponse} from "$lib/OnshapeAPI/GetBillOfMaterialsResponse";
+    import type {GetBillOfMaterialsResponse, Item} from "$lib/OnshapeAPI/GetBillOfMaterialsResponse";
 
     export let project: Project;
     export let bom: GetBillOfMaterialsResponse;
-    console.log(bom);
+    // console.log(bom);
 
-    const statePropertyName     = "state"; //title1
+    const statePropertyName = "title1"; //state
     const mfgMethodPropertyName = "title2"; //title1
 
-    const itemsByStatus = bom.bomTable.items.reduce((previousValue, currentValue) => {
+    const itemsByStatus: { [status: string]: Item[] } = bom.bomTable.items.reduce((previousValue, currentValue) => {
         if (!Array.isArray(previousValue[currentValue[statePropertyName]])) {
             previousValue[currentValue[statePropertyName]] = [];
         }
         previousValue[currentValue[statePropertyName]].push(currentValue)
         return previousValue
-    }, {})
+    }, {});
+
+    console.log("itemsByStatus", itemsByStatus);
 
     let partStatuses = [
-        "Design",          // ____, doing, done // todo state is missing as card does not exist until part is created
+        "Design",             // ____, doing, review, done // todo state is missing as card does not exist until part is created
         "Order",              // todo, doing(ordered), done
         "Manufacturing",      // todo, doing, finishing?, done
-        "Assembly", // todo, doing, done
+        "Assembly",           // todo, doing, done
         "Done",
         "Invalid Status" // if someone typo's one of the statuses
+    ];
+
+    let partStatuses2 = [
+        {
+            status: "Design", // ____, doing, review, done // todo state is missing as card does not exist until part is created
+            substatus: [
+                "Doing",
+                "Review",
+                // "done"
+            ],
+        },
+        {
+            status: "Order",  // todo, doing(ordered), done
+            substatus: [
+                "Todo",
+                "Ordered",
+                // "done"
+            ],
+        },
+        {
+            status: "Manufacturing",      // todo, doing, finishing?, done
+            substatus: [
+                "Todo",
+                "Doing",
+                "Finishing",
+                // "Done"
+            ],
+        },
+        {
+            status: "Assembly", // todo, doing, done
+            substatus: [
+                "Todo",
+                "Doing",
+                // "Done"
+            ],
+        },
+        {
+            status: "Done",
+            substatus: [],
+        },
+        {
+            status: "Invalid Status",
+            substatus: [],
+        } // if someone typo's one of the statuses
     ];
 
     // concept of linked kanbans. When complete by first works tation, moves to next work station
@@ -35,14 +81,17 @@
     let assemblies = []
     let selectedAssembly;
 
-    const isPart = (item):boolean => {
+    const isPart = (item): boolean => {
         return item.bomBehavior == 'N/A'
     }
 
     const getItems = (status) => {
+        if (status == "Design") {
+            return (itemsByStatus[status] || []).concat(itemsByStatus[""])
+        }
         if (status == "Invalid Status") {
-            let invalidStatuses = Object.keys(itemsByStatus).filter(s=>!partStatuses.includes(s));
-            return invalidStatuses.map(s=>itemsByStatus[s]).flat();
+            let invalidStatuses = Object.keys(itemsByStatus).filter(s => (!partStatuses.includes(s) && s != ""));
+            return invalidStatuses.map(s => itemsByStatus[s]).flat();
         }
         return itemsByStatus[status] || []
     }
@@ -96,15 +145,30 @@
 
                     {#each getItems(status) as item}
                         <div class="card text-dark bg-light mb-3">
-                            <div class="card-header">{isPart(item)?"Part":"Asm"}
-                                <span class="float-end">{item.item}</span></div>
+                            <div class="card-header">{isPart(item) ? "Part" : "Asm"} / {item.item}
+                                <span class="float-end">{item.partNumber}</span>
+                            </div>
                             <div class="card-body">
 
                                 {#if isPart(item)}
-                                    {item.name}
-                                    <span title="Material">Mat: {item.material.libraryName}:{item.material.displayName}</span>
-                                    <span>PN: {item.partNumber}</span>
-                                    <span>MFG: {item[mfgMethodPropertyName]}</span>
+                                    <ul>
+                                        <li>Name: {item.name}</li>
+                                        <li>Material:
+                                            {#if item.material.libraryName}
+                                                {item.material.libraryName}
+                                                :{item.material.displayName}
+                                            {:else}
+                                                Unset
+                                            {/if}
+                                        </li>
+                                        <li>PN: {item.partNumber}</li>
+                                        {#if item[mfgMethodPropertyName]}
+                                            <li>MFG: {item[mfgMethodPropertyName]}</li>
+                                        {/if}
+                                    </ul>
+                                    <a class="btn btn-primary btn-sm" target="_blank" href="{item.itemSource.viewHref}">Open
+                                        In
+                                        Onshape</a>
                                 {:else}
                                     <strong>Asm</strong>  {item.name} --
                                     {item.partNumber}
@@ -112,14 +176,12 @@
                                 {/if}
                             </div>
                             {#if status == "Invalid Status"}
-                            <div class="card-footer">
-                                ERROR - Invalid Status:<br>{item[statePropertyName]}
-                            </div>
+                                <div class="card-footer">
+                                    ERROR - Invalid Status:<br>{item[statePropertyName]}
+                                </div>
                             {/if}
                         </div>
                     {/each}
-
-
 
 
                 </div>
