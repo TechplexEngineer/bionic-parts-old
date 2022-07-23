@@ -78,7 +78,7 @@
 
     // partStatuses = Object.keys(itemsByStatus) // for testing. Or we will want to sort them
 
-    let assemblies = []
+    let assemblies: { label: string, value: any }[] = []
     let selectedAssembly;
 
     const isPart = (item): boolean => {
@@ -146,12 +146,12 @@
                     {#each getItems(status) as item}
                         <div class="card text-dark bg-light mb-3">
                             <div class="card-header">{isPart(item) ? "Part" : "Asm"} / {item.item}
-                                <span class="float-end">{item.partNumber}</span>
+                                <span class="float-end">{item.partNumber ? item.partNumber : "PN MISSING"}</span>
                             </div>
                             <div class="card-body">
 
                                 {#if isPart(item)}
-                                    <ul>
+                                    <ul style="margin-left: -20px;">
                                         <li>Name: {item.name}</li>
                                         <li>Material:
                                             {#if item.material.libraryName}
@@ -161,18 +161,24 @@
                                                 Unset
                                             {/if}
                                         </li>
-                                        <li>PN: {item.partNumber}</li>
+                                        <!--                                        <li>PN: {item.partNumber}</li>-->
                                         {#if item[mfgMethodPropertyName]}
                                             <li>MFG: {item[mfgMethodPropertyName]}</li>
                                         {/if}
                                     </ul>
-                                    <a class="btn btn-primary btn-sm" target="_blank" href="{item.itemSource.viewHref}">Open
-                                        In
+                                    <a class="btn btn-primary btn-sm" target="_blank" href="{item.itemSource.viewHref}">
                                         Onshape</a>
                                 {:else}
-                                    <strong>Asm</strong>  {item.name} --
-                                    {item.partNumber}
-                                    {item[mfgMethodPropertyName]}
+                                    <ul style="margin-left: -20px;">
+                                        <li>Name: {item.name}</li>
+                                        {#if item[mfgMethodPropertyName]}
+                                            <li>MFG: {item[mfgMethodPropertyName]}</li>
+                                        {/if}
+                                    </ul>
+                                    <a class="btn btn-primary btn-sm" target="_blank" href="{item.itemSource.viewHref}">
+                                        Onshape</a>
+                                    <a class="btn btn-info btn-sm" target="_blank" href="{item.itemSource.viewHref}">
+                                        Inspect</a>
                                 {/if}
                             </div>
                             {#if status == "Invalid Status"}
